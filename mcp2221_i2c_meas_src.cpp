@@ -7,26 +7,19 @@
 #include <conio.h>
 #include <Windows.h>
 #include <iso646.h>
-//#include "D:\Tools\Libraries\mcp2221\unmanaged_211\dll\mcp2221_dll_um.h"
 #include "mcp2221_dll_um.h"
 #include "tsd305.h"
 #include "htu21d.h"
 #include "ms5637.h"
 #include "tsys01.h"
-#pragma comment(lib, "D:\\Tools\\Libraries\\mcp2221\\unmanaged_211\\dll\\mcp2221_dll_um_x86.lib")
+#pragma comment(lib, "mcp2221_dll_um_x86.lib")
 
-#define pi 22/7
 #define I2cAddr7bit 1
 #define I2cAddr8bit 0
 
-
-//File logging variables
-FILE * logFile;		//Create file to save temperature log
-
-					//Global variables
+//Global variables
 void *handle;
 int i;
-int phase = 0;
 
 wchar_t SerNum = 0x0000075428;
 wchar_t LibVer[6];
@@ -45,8 +38,6 @@ unsigned char RxData[7] = { 0 };
 unsigned char Addr = 0x00;
 unsigned char DummyByte = 0x00;
 
-tsd305 m_tsd305;
-
 //Functions prototypes
 void ExitFunc();
 void Mcp2221_config();
@@ -55,8 +46,6 @@ void ExitFunc()
 {
 	Mcp2221_I2cCancelCurrentTransfer(handle);
 	Mcp2221_CloseAll();
-	//Mcp2221_Close(handle);
-	fclose(logFile);
 	//_sleep(100);
 }
 
@@ -84,9 +73,6 @@ void Mcp2221_config()
 	{
 		printf("Number of devices found: %d\n", NumOfDev);
 	}
-
-	//open device by S/N
-	//handle = Mcp2221_OpenBySN(VID, PID, &SerNum);
 
 	//Open device by index
 	handle = Mcp2221_OpenByIndex(VID, PID, NumOfDev - 1);
@@ -194,9 +180,7 @@ int main(int argc, char *argv[])
 	if(m_ms5637.is_connected()) printf("MS5637 is connected.\n");
 	if(m_tsd305.is_connected()) printf("TSD305 is connected.\n");
 	if(m_htu21d.is_connected()) printf("HTU21D is connected.\n");
-	if (m_tsys01.is_connected()) printf("TSYS01 is connected.\n");
-
-	//Mcp2221_GetErrorName(error);
+	if(m_tsys01.is_connected()) printf("TSYS01 is connected.\n");
 
 	while (1)
 	{
@@ -211,13 +195,6 @@ int main(int argc, char *argv[])
 
 		m_tsys01.read_temperature(&tsys01_temperature);
 		printf("\nTSYS01:: Temperature: %.2f C\n", tsys01_temperature);
-
-		_sleep(2000);
-
-		/*if (_kbhit())
-		{
-		if (_getch() == 'q')
-		exit(1);
-		}*/
+		Sleep(2000);
 	}
 }
