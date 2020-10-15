@@ -1,5 +1,7 @@
 # MCP2221 Library for TE MEAS Weather Station Raspberry Pi Hat
-This is a port of Arduino libraries for the TE MEAS Weather Station Raspberry Pi hat for MCP2221 USB to UART/Ia2C bridge chip. It interfaces the four sensors on-board via I2C. The four sensors are:
+These are a collection of C++ library for interfacing the TE MEAS Weather Station Raspberry Pi hat with MCP2221 USB to UART/Ia2C bridge chip. The libraries are ported from Arduin libraries developed by TE, the original libraries can be found here: https://github.com/TEConnectivity
+
+The four sensors aboard the MEAS weather station Pi hat are:
 - TSD305-1C55 contactless IR temperature and ambient temperature sensor.
 - HTU21D temperature and humidity sensor.
 - MS5637 pressure and temperature sensor.
