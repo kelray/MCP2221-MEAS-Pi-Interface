@@ -13,6 +13,11 @@ The project was developed and compiled with Visual Studio 2015.
 
 ![MCP2221_MEAS](https://user-images.githubusercontent.com/8460504/96188790-2cb80a80-0ef4-11eb-977c-e719eeb9de13.jpg)
 
+**Output:**
+
+
+<img width="674" alt="mcp2221_meas_screenshot" src="https://user-images.githubusercontent.com/8460504/96192810-b0292a00-0efb-11eb-99f6-dc7b5b470bcd.png">
+
 The four sensors aboard the MEAS weather station Pi hat are:
 - TSD305-1C55 contactless IR temperature and ambient temperature sensor.
 - HTU21D temperature and humidity sensor.
