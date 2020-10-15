@@ -1,6 +1,6 @@
-/*	Project: Interfacing TE MEAS Weather Station with MCP2221 via I2C
-*	By: Karim El-Rayes
-*	Initiation date: October 13, 2020
+/*	
+*	Usage Example of TE MEAS Weather Station libraries with MCP2221 USB-UART/I2C bridge IC
+*	This project compiles successfully with Visual Studio 2015
 */
 
 #include <stdio.h>
