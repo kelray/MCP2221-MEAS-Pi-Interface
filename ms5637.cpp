@@ -1,5 +1,3 @@
-//#include <Wire.h>
-
 #include <stdint.h>
 #include <stdio.h>
 #include <Windows.h>
@@ -57,7 +55,6 @@ ms5637::ms5637(void) {}
  * \brief Perform initial configuration. Has to be called once.
  */
 void ms5637::begin(void) {
-  //Wire.begin();
 }
 
 /**
@@ -68,10 +65,7 @@ void ms5637::begin(void) {
 *       - false : Device is not acknowledging I2C address
 */
 bool ms5637::is_connected(void) 
-{
-  //Wire.beginTransmission((uint8_t)MS5637_ADDR);
-  //return (Wire.endTransmission() == 0);
-  
+{ 
 	bool conn_flag;
 	flag = Mcp2221_I2cWrite(handle, sizeof(DummyByte), MS5637_ADDR, I2cAddr7bit, &DummyByte);    //issue start condition then address
 	if (flag == 0) conn_flag = true;
@@ -91,19 +85,9 @@ bool ms5637::is_connected(void)
 */
 enum ms5637_status ms5637::write_command(uint8_t cmd) {
   uint8_t i2c_status;
-
-  /*Wire.beginTransmission((uint8_t)MS5637_ADDR);
-  Wire.write(cmd);
-  i2c_status = Wire.endTransmission();*/
   
   flag = Mcp2221_I2cWrite(handle, 1, MS5637_ADDR, I2cAddr7bit, &cmd);
   if(flag != 0) printf("Error writing cmd to MS5637 (1): %s\n", Mcp2221_GetErrorName(flag));
-
-  /* Do the transfer */
-  /*if (i2c_status == ms5637_STATUS_ERR_OVERFLOW)
-    return ms5637_status_no_i2c_acknowledge;
-  if (i2c_status != ms5637_STATUS_OK)
-    return ms5637_status_i2c_transfer_error;*/
 
   return ms5637_status_ok;
 }
@@ -151,24 +135,11 @@ enum ms5637_status ms5637::read_eeprom_coeff(uint8_t command, uint16_t *coeff) {
   buffer[1] = 0;
 
   /* Read data */
-  /*Wire.beginTransmission((uint8_t)MS5637_ADDR);
-  Wire.write(command);
-  i2c_status = Wire.endTransmission();*/
-  
   flag = Mcp2221_I2cWrite(handle, 1, MS5637_ADDR, I2cAddr7bit, &command);
   if(flag != 0) printf("Error writing command to MS5637 (2): %s\n", Mcp2221_GetErrorName(flag));
-
-  /*Wire.requestFrom((uint8_t)MS5637_ADDR, 2U);
-  for (i = 0; i < 2; i++) {
-    buffer[i] = Wire.read();
-  }*/
   
   flag = Mcp2221_I2cRead(handle, 2, MS5637_ADDR, I2cAddr7bit, buffer);
   if(flag != 0) printf("Error reading from MS5637 (3): %d\n", Mcp2221_GetErrorName(flag));
-  
-  // Send the conversion command
-  //if (i2c_status == ms5637_STATUS_ERR_OVERFLOW)
-  //  return ms5637_status_no_i2c_acknowledge;
 
   *coeff = (buffer[0] << 8) | buffer[1];
 
@@ -260,27 +231,15 @@ enum ms5637_status ms5637::conversion_and_read_adc(uint8_t cmd, uint32_t *adc) {
   uint8_t i;
  
   /* Read data */
-  /*Wire.beginTransmission((uint8_t)MS5637_ADDR);
-  Wire.write((uint8_t)cmd);
-  Wire.endTransmission();*/
-
   flag = Mcp2221_I2cWrite(handle, 1, MS5637_ADDR, I2cAddr7bit, &cmd); 
   if(flag != 0) printf("Error writing cmd to MS5637 (4): %s\n", Mcp2221_GetErrorName(flag));
   
   Sleep(conversion_time[(cmd & MS5637_CONVERSION_OSR_MASK) / 2]);
-
-  /*Wire.beginTransmission((uint8_t)MS5637_ADDR);
-  Wire.write((uint8_t)0x00);
-  i2c_status = Wire.endTransmission();*/
   
   uint8_t tCmd = 0x00;
   flag = Mcp2221_I2cWrite(handle, 1, MS5637_ADDR, I2cAddr7bit, &tCmd);
   if(flag != 0) printf("Error writing cmd to MS5637 (5): %s\n", Mcp2221_GetErrorName(flag));
 
-  /*Wire.requestFrom((uint8_t)MS5637_ADDR, 3U);
-  for (i = 0; i < 3; i++) {
-    buffer[i] = Wire.read();
-  }*/
   flag = Mcp2221_I2cRead(handle, 3, MS5637_ADDR, I2cAddr7bit, buffer);
   if(flag != 0) printf("Error reading from MS5637 (6): %s\n", Mcp2221_GetErrorName(flag));
   
@@ -289,14 +248,8 @@ enum ms5637_status ms5637::conversion_and_read_adc(uint8_t cmd, uint32_t *adc) {
     return status;
 
   // Send the read command
-  // status = ms5637_write_command(MS5637_READ_ADC);
   if (status != ms5637_status_ok)
     return status;
-
-  /*if (i2c_status == ms5637_STATUS_ERR_OVERFLOW)
-    return ms5637_status_no_i2c_acknowledge;
-  if (i2c_status != ms5637_STATUS_OK)
-    return ms5637_status_i2c_transfer_error;*/
 
   *adc = ((uint32_t)buffer[0] << 16) | ((uint32_t)buffer[1] << 8) | buffer[2];
 

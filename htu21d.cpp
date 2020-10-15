@@ -1,5 +1,3 @@
-//#include <Wire.h>
-
 #include <stdint.h>
 #include <stdio.h>
 #include <Windows.h>
@@ -99,9 +97,7 @@ htu21d::htu21d(void) {
 /**
  * \brief Perform initial configuration. Has to be called once.
  */
-void htu21d::begin(void) 
-{
-  //Wire.begin();
+void htu21d::begin(void) {
 }
 
 /**
@@ -112,10 +108,7 @@ void htu21d::begin(void)
  *       - false : Device is not acknowledging I2C address
  */
 bool htu21d::is_connected(void) 
-{
-  /*Wire.beginTransmission((byte)HTU21_ADDR);
-  return (Wire.endTransmission() == 0);*/
-  
+{  
 	bool conn_flag;
 	flag = Mcp2221_I2cWrite(handle, sizeof(DummyByte), HTU21_ADDR, I2cAddr7bit, &DummyByte);    //issue start condition then address
 	if (flag == 0) conn_flag = true;
@@ -151,24 +144,12 @@ enum htu21_status htu21d::read_user_register(uint8_t *value) {
   uint8_t i2c_status;
   uint8_t buffer[1];
 
-  // Read DATA
-  /*Wire.beginTransmission((uint8_t)HTU21_ADDR);
-  Wire.write((uint8_t)HTU21_READ_USER_REG_COMMAND);
-  i2c_status = Wire.endTransmission();*/
-  
+  // Read DATA 
   flag = Mcp2221_I2cWrite(handle, 1, HTU21_ADDR, I2cAddr7bit, &HTU21_READ_USER_REG_COMMAND);
   if(flag != 0) printf("Error writing to HTU21D (1): %s\n", Mcp2221_GetErrorName(flag));
 
-  //Wire.requestFrom((uint8_t)HTU21_ADDR, (uint8_t)1);
-  //buffer[0] = Wire.read();
-
   flag = Mcp2221_I2cRead(handle, 1, HTU21_ADDR, I2cAddr7bit, &buffer[0]);
   if(flag != 0) printf("Error reading from HTU21D (2): %d\n", Mcp2221_GetErrorName(flag));
-  
-  /*if (i2c_status == htu21_STATUS_ERR_OVERFLOW)
-    return htu21_status_no_i2c_acknowledge;
-  if (i2c_status != htu21_STATUS_OK)
-    return htu21_status_i2c_transfer_error;*/
 
   *value = buffer[0];
   return htu21_status_ok;
@@ -199,21 +180,11 @@ enum htu21_status htu21d::write_user_register(uint8_t value) {
   reg &= HTU21_USER_REG_RESERVED_MASK;
   // Set bits from value that are not reserved
   reg |= (value & ~HTU21_USER_REG_RESERVED_MASK);
-
-  /*Wire.beginTransmission((uint8_t)HTU21_ADDR);
-  Wire.write((uint8_t)HTU21_WRITE_USER_REG_COMMAND);
-  Wire.write((uint8_t)reg);
-  i2c_status = Wire.endTransmission();*/
   
   buffer[0] = HTU21_WRITE_USER_REG_COMMAND;
   buffer[1] = reg;
   flag = Mcp2221_I2cWrite(handle, 2, HTU21_ADDR, I2cAddr7bit, buffer);
   if(flag != 0) printf("Error writing to HTU21D (3): %s\n", Mcp2221_GetErrorName(flag));
-
-  /*if (i2c_status == htu21_STATUS_ERR_OVERFLOW)
-    return htu21_status_no_i2c_acknowledge;
-  if (i2c_status != htu21_STATUS_OK)
-    return htu21_status_i2c_transfer_error;*/
 
   return htu21_status_ok;
 }
@@ -333,22 +304,13 @@ enum htu21_status htu21d::get_battery_status(enum htu21_battery_status *bat) {
  *       - htu21_status_i2c_transfer_error : Problem with i2c transfer
  *       - htu21_status_no_i2c_acknowledge : I2C did not acknowledge
  */
-enum htu21_status htu21d::write_command(uint8_t cmd) {
+enum htu21_status htu21d::write_command(uint8_t cmd) 
+{
   uint8_t i2c_status;
-
-  /*Wire.beginTransmission((uint8_t)HTU21_ADDR);
-  Wire.write(cmd);
-  i2c_status = Wire.endTransmission();*/
   
   flag = Mcp2221_I2cWrite(handle, 1, HTU21_ADDR, I2cAddr7bit, &cmd);
   if(flag != 0) printf("Error writing cmd to HTU21D (4): %s\n", Mcp2221_GetErrorName(flag));
   
-  /* Do the transfer */
-  /*if (i2c_status == htu21_STATUS_ERR_OVERFLOW)
-    return htu21_status_no_i2c_acknowledge;
-  if (i2c_status != htu21_STATUS_OK)
-    return htu21_status_i2c_transfer_error;*/
-
   return htu21_status_ok;
 }
 
@@ -370,8 +332,6 @@ enum htu21_status htu21d::reset(void) {
   htu21_temperature_conversion_time =
       HTU21_TEMPERATURE_CONVERSION_TIME_T_14b_RH_12b;
   htu21_humidity_conversion_time = HTU21_HUMIDITY_CONVERSION_TIME_T_14b_RH_12b;
-
-  //delay(RESET_TIME);
   Sleep(RESET_TIME);
 
   return htu21_status_ok;
@@ -430,38 +390,20 @@ enum htu21_status htu21d::temperature_conversion_and_read_adc(uint16_t *adc) {
   uint8_t i;
 
   /* Command */
-  //Wire.beginTransmission((uint8_t)HTU21_ADDR);
   if (i2c_master_mode == htu21_i2c_hold) 
   {
-    //Wire.write((uint8_t)HTU21_READ_TEMPERATURE_W_HOLD_COMMAND);
-    //Wire.endTransmission();
 	flag = Mcp2221_I2cWrite(handle, 1, HTU21_ADDR, I2cAddr7bit, &HTU21_READ_TEMPERATURE_W_HOLD_COMMAND);
     if(flag != 0) printf("Error writing HTU21_READ_TEMPERATURE_W_HOLD_COMMAND to HTU21D (5): %s\n", Mcp2221_GetErrorName(flag));
   } 
   else 
-  {
-    //Wire.write((uint8_t)HTU21_READ_TEMPERATURE_WO_HOLD_COMMAND);
-    //Wire.endTransmission();
-    //delay((uint8_t)TEMPERATURE_TIME);
-	
+  {	
 	flag = Mcp2221_I2cWrite(handle, 1, HTU21_ADDR, I2cAddr7bit, &HTU21_READ_TEMPERATURE_WO_HOLD_COMMAND);
     if(flag != 0) printf("Error writing HTU21_READ_TEMPERATURE_WO_HOLD_COMMAND to HTU21D (6): %s\n", Mcp2221_GetErrorName(flag));
 	Sleep(TEMPERATURE_TIME);
   }
-
-  /* Read data */
-  /*Wire.requestFrom((uint8_t)HTU21_ADDR, 3U);
-  for (i = 0; i < 3; i++) {
-    buffer[i] = Wire.read();
-  }*/
   
    flag = Mcp2221_I2cRead(handle, 3, HTU21_ADDR, I2cAddr7bit, buffer);
    if(flag != 0) printf("Error reading from HTU21D (7): %d\n", Mcp2221_GetErrorName(flag));
-
-  /*if (i2c_status == htu21_STATUS_ERR_OVERFLOW)
-    return htu21_status_no_i2c_acknowledge;
-  if (i2c_status != htu21_STATUS_OK)
-    return htu21_status_i2c_transfer_error;*/
 
   _adc = (buffer[0] << 8) | buffer[1];
 
@@ -495,37 +437,20 @@ enum htu21_status htu21d::humidity_conversion_and_read_adc(uint16_t *adc) {
   uint8_t i;
 
   /* Read data */
-  //Wire.beginTransmission((uint8_t)HTU21_ADDR);
   if (i2c_master_mode == htu21_i2c_hold) 
   {
-    //Wire.write((uint8_t)HTU21_READ_HUMIDITY_W_HOLD_COMMAND);
-    //Wire.endTransmission();
 	flag = Mcp2221_I2cWrite(handle, 1, HTU21_ADDR, I2cAddr7bit, &HTU21_READ_HUMIDITY_W_HOLD_COMMAND);
     if(flag != 0) printf("Error writing HTU21_READ_HUMIDITY_W_HOLD_COMMAND to HTU21D (8): %s\n", Mcp2221_GetErrorName(flag));
   } 
   else 
   {
-    //Wire.write((uint8_t)HTU21_READ_HUMIDITY_WO_HOLD_COMMAND);
-    //Wire.endTransmission();
-    //delay((uint8_t)HUMIDITY_TIME);
-	
 	flag = Mcp2221_I2cWrite(handle, 1, HTU21_ADDR, I2cAddr7bit, &HTU21_READ_HUMIDITY_WO_HOLD_COMMAND);
     if(flag != 0) printf("Error writing HTU21_READ_HUMIDITY_WO_HOLD_COMMAND to HTU21D (9): %s\n", Mcp2221_GetErrorName(flag));
 	Sleep(HUMIDITY_TIME);
   }
 
-  /*Wire.requestFrom((uint8_t)HTU21_ADDR, 3U);
-  for (i = 0; i < 3; i++) {
-    buffer[i] = Wire.read();
-  }
-  Wire.endTransmission();*/
   flag = Mcp2221_I2cRead(handle, 3, HTU21_ADDR, I2cAddr7bit, buffer);
   if(flag != 0) printf("Error reading from HTU21D (10): %d\n", Mcp2221_GetErrorName(flag));
-
-  /*if (i2c_status == htu21_STATUS_ERR_OVERFLOW)
-    return htu21_status_no_i2c_acknowledge;
-  if (i2c_status != htu21_STATUS_OK)
-    return htu21_status_i2c_transfer_error;*/
 
   _adc = (buffer[0] << 8) | buffer[1];
   // compute CRC
@@ -688,55 +613,25 @@ enum htu21_status htu21d::read_serial_number(uint64_t *serial_number) {
   uint8_t i;
   uint8_t cmd_buf[3];
 
-  // Read the first 8 bytes
-  /*Wire.beginTransmission((uint8_t)HTU21_ADDR);
-  Wire.write((uint8_t)HTU21_READ_SERIAL_FIRST_8BYTES_COMMAND_MSB);
-  Wire.write((uint8_t)HTU21_READ_SERIAL_FIRST_8BYTES_COMMAND_LSB);
-  Wire.endTransmission();*/
-  
+  // Read the first 8 bytes  
   cmd_buf[0] = HTU21_READ_SERIAL_FIRST_8BYTES_COMMAND_MSB;
   cmd_buf[1] = HTU21_READ_SERIAL_FIRST_8BYTES_COMMAND_LSB;
   flag = Mcp2221_I2cWrite(handle, 2, HTU21_ADDR, I2cAddr7bit, cmd_buf);
   if(flag != 0) printf("Error writing cmd_buf to HTU21D (11): %s\n", Mcp2221_GetErrorName(flag));
   
-
-  /*Wire.requestFrom(HTU21_ADDR, 8);
-  for (i = 0; i < 8; i++) {
-    rcv_data[i] = Wire.read();
-  }*/
   flag = Mcp2221_I2cRead(handle, 8, HTU21_ADDR, I2cAddr7bit, rcv_data);
   if(flag != 0) printf("Error reading from HTU21D (12): %d\n", Mcp2221_GetErrorName(flag));
   
   // Read the last 6 bytes
-  /*Wire.beginTransmission((byte)0x40);
-  Wire.write((uint8_t)HTU21_READ_SERIAL_LAST_6BYTES_COMMAND_MSB);
-  Wire.write((uint8_t)HTU21_READ_SERIAL_LAST_6BYTES_COMMAND_LSB);
-  Wire.endTransmission();*/
-  
   cmd_buf[0] = 0x40;
   cmd_buf[1] = HTU21_READ_SERIAL_LAST_6BYTES_COMMAND_MSB;
   cmd_buf[2] = HTU21_READ_SERIAL_LAST_6BYTES_COMMAND_LSB;
   flag = Mcp2221_I2cWrite(handle, 3, HTU21_ADDR, I2cAddr7bit, cmd_buf);
   if(flag != 0) printf("Error writing cmd_buf to HTU21D (13): %s\n", Mcp2221_GetErrorName(flag));
   
-  /*Wire.requestFrom(HTU21_ADDR, 6);
-  for (i = 8; i < 14; i++) {
-    rcv_data[i] = Wire.read();
-  }*/
   flag = Mcp2221_I2cRead(handle, 6, HTU21_ADDR, I2cAddr7bit, rcv_data2);
   if(flag != 0) printf("Error reading from HTU21D (14): %d\n", Mcp2221_GetErrorName(flag));
   memmove(rcv_data+8, rcv_data2, 6);
-  
-  /*if (i2c_status == htu21_STATUS_ERR_OVERFLOW)
-    return htu21_status_no_i2c_acknowledge;
-  if (i2c_status != htu21_STATUS_OK)
-    return htu21_status_i2c_transfer_error;
-
-  // Do the transfer
-  if (i2c_status == htu21_STATUS_ERR_OVERFLOW)
-    return htu21_status_no_i2c_acknowledge;
-  if (i2c_status != htu21_STATUS_OK)
-    return htu21_status_i2c_transfer_error;*/
 
   *serial_number =
       ((uint64_t)rcv_data[0] << 56) | ((uint64_t)rcv_data[2] << 48) |

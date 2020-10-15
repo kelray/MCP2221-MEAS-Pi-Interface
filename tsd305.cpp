@@ -1,6 +1,4 @@
 #include "tsd305.h"
-//#include <Wire.h>
-//#include <avr/pgmspace.h>
 #include "mcp2221_dll_um.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -128,28 +126,7 @@ tsd305::tsd305(void) {
  */
 void tsd305::begin(void) 
 {
-    /*//Set I2C bus
-	flag = Mcp2221_SetSpeed(handle, 500000);    //set I2C speed to 400 KHz
-	if (flag == 0)
-	{
-		printf("I2C is configured\n");
-	}
-	else
-	{
-		printf("Error setting I2C bus: %d\n", flag);
-		Mcp2221_I2cCancelCurrentTransfer(handle);
-	}
 
-	//Set I2C advanced parameters
-	flag = Mcp2221_SetAdvancedCommParams(handle, 1, 1000);  //1ms timeout, try 1000 times
-	if (flag == 0)
-	{
-		printf("I2C advanced settings set\n");
-	}
-	else
-	{
-		printf("Error setting I2C advanced settings: %d\n", flag);
-	}*/
 }
 
 /**
@@ -159,9 +136,8 @@ void tsd305::begin(void)
  *       - true : Device is present
  *       - false : Device is not acknowledging I2C address
   */
-bool tsd305::is_connected(void) {
-  //Wire.beginTransmission((uint8_t)TSD305_ADDR);
-  //return (Wire.endTransmission() == 0);
+bool tsd305::is_connected(void) 
+{
 	bool conn_flag;
 	flag = Mcp2221_I2cWrite(handle, sizeof(DummyByte), TSD305_ADDR, I2cAddr7bit, &DummyByte);    //issue start condition then address
 	if (flag == 0)
@@ -171,8 +147,6 @@ bool tsd305::is_connected(void) {
 	}
 	else
 	{
-		//printf("Error, Address not found: %d\n", flag);
-		//Mcp2221_I2cCancelCurrentTransfer(handle);
 		conn_flag = false;
 	}
 	return conn_flag;
@@ -196,27 +170,14 @@ enum tsd305_status tsd305::read_eeprom_coeff(uint8_t address, uint16_t *coeff) {
   uint8_t buffer[3];
   uint8_t status_byte = 0;
   uint8_t i;
+  
   /* Read data */
-  //Wire.beginTransmission((uint8_t)TSD305_ADDR);
-  //Wire.write(address);
-  // Send the conversion command
-  //Wire.endTransmission();
-  //delay(1);
   flag = Mcp2221_I2cWrite(handle, 1, TSD305_ADDR, I2cAddr7bit, &address); 
   if(flag != 0) printf("Error writing command to TDS305: %d\n", flag);
   
-  //Wire.requestFrom((uint8_t)TSD305_ADDR, 3U);
-  //for (i = 0; i < 3; i++)
-  //  buffer[i] = Wire.read();
   flag = Mcp2221_I2cRead(handle, 3, TSD305_ADDR, I2cAddr7bit, buffer);
   if(flag != 0) printf("Error reading from TDS305: %d\n", flag);
   
-  /*if (i2c_status == STATUS_ERR_OVERFLOW)
-    return tsd305_status_no_i2c_acknowledge;
-  if (i2c_status != STATUS_OK)
-    return tsd305_status_i2c_transfer_error;
-	*/
-	
   status_byte = buffer[0];
   if (status_byte & TSD305_STATUS_BUSY_MASK)
     return tsd305_status_busy;
@@ -321,27 +282,12 @@ enum tsd305_status tsd305::conversion_and_read_adcs(uint32_t *adc_object,
   uint8_t i;
 
   /* Read data */
-  //Wire.beginTransmission((uint8_t)TSD305_ADDR);
-  //Wire.write((uint8_t)TSD305_CONVERT_ADCS_COMMAND);
-  //i2c_status = Wire.endTransmission();
-  //delay(TSD305_CONVERSION_TIME);
   flag = Mcp2221_I2cWrite(handle, 1, TSD305_ADDR, I2cAddr7bit, &TSD305_CONVERT_ADCS_COMMAND); 
   if(flag != 0) printf("Error writing conversion command to TDS305: %d\n", flag);
   Sleep(TSD305_CONVERSION_TIME);
   
-  //Wire.requestFrom((uint8_t)TSD305_ADDR, 7U);
-  //for (i = 0; i < 7; i++)
-  //  buffer[i] = Wire.read();
   flag = Mcp2221_I2cRead(handle, 7, TSD305_ADDR, I2cAddr7bit, buffer);
   if(flag != 0) printf("Error reading from TDS305: %d\n", flag);
-
-  // Send the conversion command
-
-  /*if (i2c_status == STATUS_ERR_OVERFLOW)
-    return tsd305_status_no_i2c_acknowledge;
-  if (i2c_status != STATUS_OK)
-    return tsd305_status_i2c_transfer_error;
-	*/
 	
   status_byte = buffer[0];
   if (status_byte & TSD305_STATUS_BUSY_MASK)
@@ -353,11 +299,6 @@ enum tsd305_status tsd305::conversion_and_read_adcs(uint32_t *adc_object,
                 (uint32_t)buffer[3];
   *adc_ambient = ((uint32_t)buffer[4] << 16) | ((uint32_t)buffer[5] << 8) |
                  (uint32_t)buffer[6];
-  /*printf("debug::adc_object: %d\n", adc_object);
-  /*for (int i = 0; i < 7; i++)
-  {
-	  printf("debug::adc_object[%d]: %X\n", i, buffer[i]);
-  }*/
   return tsd305_status_ok;
 }
 
@@ -395,17 +336,14 @@ tsd305::read_temperature_and_object_temperature(float *temperature,
 
   ASSERT_STATUS(conversion_and_read_adcs((uint32_t *)&adc_object,
                                          (uint32_t *)&adc_ambient));
-  //printf("debug::adc_object: %d\n", adc_object);
 
   *temperature = (float)adc_ambient / 16777216.0f *
                      ((float)eeprom_coeff.max_ambient_temperature -
                       (float)eeprom_coeff.min_ambient_temperature) +
                  (float)eeprom_coeff.min_ambient_temperature;
-  //printf("debug::temperature: %f\n", *temperature);	//it works
 
   adc_object = (int64_t)(adc_object - 8388608) *
                eeprom_coeff.adc_calibration_factor / 1000;
-  //printf("debug::adc_object: %d\n", adc_object);	//it works
 
   if ((*temperature > get_lut_at(1, 0)) && (*temperature <= get_lut_at(LUT_AMBIENT_SIZE, 0))) 
   { 
@@ -458,12 +396,10 @@ tsd305::read_temperature_and_object_temperature(float *temperature,
         (*temperature - amb_min) / (amb_max - amb_min) *
             (object_temperature_max - object_temperature_min) +
         object_temperature_min;
-	//printf("debug::object_temperature: %.2f\n", *object_temperature);
   } 
   else 
   {
     status = tsd305_status_out_of_range;
-	//printf("debug::out of range status\n");
   }
 
   return status;
