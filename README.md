@@ -19,10 +19,11 @@ The project was developed and compiled with Visual Studio 2015.
 <img width="674" alt="mcp2221_meas_screenshot" src="https://user-images.githubusercontent.com/8460504/96192810-b0292a00-0efb-11eb-99f6-dc7b5b470bcd.png">
 
 The four sensors aboard the MEAS weather station Pi hat are:
-- TSD305-1C55 contactless IR temperature and ambient temperature sensor.
+- TSD305-1C55 contactless and ambient temperature sensor.
 - HTU21D temperature and humidity sensor.
 - MS5637 pressure and temperature sensor.
 - TSYS01 temperature sensor.
 
 For MCP2221 wiring guide, please visit this tutorial: http://elrayescampaign.blogspot.com/2018/06/mcp2221-i2c-interfacing-tutorial.html
+
 For more information please visit the TE MEAS weather station Pi hat documentation and datasheets here: https://www.te.com/global-en/product-CAT-DCS0036.html
