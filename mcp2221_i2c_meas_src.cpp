@@ -12,15 +12,13 @@
 #include "htu21d.h"
 #include "ms5637.h"
 #include "tsys01.h"
-#pragma comment(lib, "mcp2221_dll_um_x86.lib")
+#pragma comment(lib, "mcp2221_dll_um_x86.lib")	//Link MCP2221 library
 
 #define I2cAddr7bit 1
 #define I2cAddr8bit 0
 
 //Global variables
 void *handle;
-int i;
-
 wchar_t SerNum = 0x0000075428;
 wchar_t LibVer[6];
 wchar_t MfrDescriptor[30];
@@ -28,13 +26,11 @@ wchar_t ProdDescrip[30];
 int ver = 0;
 int error = 0;
 int flag = 0;
-unsigned int delay = 0;
 unsigned int ReqCurrent;
 unsigned int PID = 0xDD;
 unsigned int VID = 0x4D8;
 unsigned int NumOfDev = 0;
 unsigned char PowerAttrib;
-unsigned char RxData[7] = { 0 };
 unsigned char Addr = 0x00;
 unsigned char DummyByte = 0x00;
 
