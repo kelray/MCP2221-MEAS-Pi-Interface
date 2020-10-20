@@ -44,9 +44,8 @@ void Mcp2221_config();
 
 void ExitFunc()
 {
-	Mcp2221_I2cCancelCurrentTransfer(handle);
-	Mcp2221_CloseAll();
-	//_sleep(100);
+	Mcp2221_I2cCancelCurrentTransfer(handle);	//cancel any I2C transaction
+	Mcp2221_CloseAll();	//close handles for all MCP2221 devices
 }
 
 void Mcp2221_config()
@@ -67,7 +66,6 @@ void Mcp2221_config()
 	if (NumOfDev == 0)
 	{
 		printf("No MCP2221 devices connected\n");
-		//exit(0);
 	}
 	else
 	{
@@ -75,7 +73,7 @@ void Mcp2221_config()
 	}
 
 	//Open device by index
-	handle = Mcp2221_OpenByIndex(VID, PID, NumOfDev - 1);
+	handle = Mcp2221_OpenByIndex(VID, PID, NumOfDev - 1);	//open first MCP2221 device
 	if (error == NULL)
 	{
 		printf("Connection successful\n");
@@ -170,13 +168,10 @@ int main(int argc, char *argv[])
 	//Register exit function
 	atexit(ExitFunc);
 
-	//Configure any connected MCP2221
+	//Configure any connected MCP2221 and configure I2C bus
 	Mcp2221_config();
-	m_ms5637.begin();
-	m_tsd305.begin();
-	m_htu21d.begin();
-	m_tsys01.begin();
 
+	//Check if all sensors are connected
 	if(m_ms5637.is_connected()) printf("MS5637 is connected.\n");
 	if(m_tsd305.is_connected()) printf("TSD305 is connected.\n");
 	if(m_htu21d.is_connected()) printf("HTU21D is connected.\n");
@@ -184,17 +179,21 @@ int main(int argc, char *argv[])
 
 	while (1)
 	{
+		//Read and display ambient temperature and pressure from MS5637 sensor
 		status_MS5637 = m_ms5637.read_temperature_and_pressure(&ms5637_temperature, &ms5637_pressure);
 		printf("\nMS5637: Temperature: %.2f C, Pressure: %.2f hPa\n", ms5637_temperature, ms5637_pressure);
 
+		//Read and display ambient and object temperature from TSD305 sensor
 		status_TSD305 = m_tsd305.read_temperature_and_object_temperature(&tsd305_temperature, &tsd305_object_temperature);
 		printf("\nTSD305: Temperature: %.2f C, Object temperature: %.2f C\n", tsd305_temperature, tsd305_object_temperature);
 
+		//Read and display ambient temperature & humidity from HTU21D sensor
 		status_HTU21 = m_htu21d.read_temperature_and_relative_humidity(&htu21d_temperature, &htu21d_humidity);
-		printf("\nHTU21D: Temperature: %.2f C, humidity: %.2f \%RH\n", htu21d_temperature, htu21d_humidity);
-
+		printf("\nHTU21D: Temperature: %.2f C, humidity: %.2f \%RH\n", htu21d_temperature, htu21d_humidity); 
+		
+		//Read and display ambient temperature from TSYS01 sensor
 		m_tsys01.read_temperature(&tsys01_temperature);
-		printf("\nTSYS01:: Temperature: %.2f C\n", tsys01_temperature);
-		Sleep(2000);
+		printf("\nTSYS01:: Temperature: %.2f C\n", tsys01_temperature);		
+		Sleep(2000);	//delay for 2 seconds
 	}
 }
