@@ -3,7 +3,7 @@ These are a collection of C++ libraries for interfacing the TE MEAS Weather Stat
 
 **About the porting process:**
 
-The porting efforts focused on replacing Ardunio I2C APIs with MCP2221 ones, with minimum changes to variables and constants to accommodate the Microchip MCP2221 library APIs input/output arguments. Another reason to make the ported libraries almost identical to the original TE Arduino libraries is to ease usage and integration for developers who are new to the MCP2221 and/or already have Arduino experience. 
+The porting efforts focused on replacing Ardunio I2C APIs with MCP2221 ones, with minimum changes to variables and constants to accommodate the Microchip MCP2221 library APIs input/output arguments. The reason to keep the ported libraries almost identical to the original TE Arduino libraries is to ease usage and integration for developers who are new to the MCP2221 and/or already have Arduino experience. 
 
 **Tools and other requirements:**
 
