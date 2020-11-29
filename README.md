@@ -1,9 +1,9 @@
 # MCP2221 Library for TE MEAS Weather Station Raspberry Pi Hat
-These are a collection of C++ libraries for interfacing the TE MEAS Weather Station Raspberry Pi hat with MCP2221 USB to UART/Ia2C bridge chip. The libraries are ported from Arduin libraries developed by TE, the original libraries can be found here: https://github.com/TEConnectivity
+These are a collection of C++ libraries for interfacing the TE MEAS Weather Station Raspberry Pi hat with MCP2221 USB-to-I2C/UART bridge IC. All libraries listed here are ported from the Arduino libraries developed by TE. The original libraries can be found here: https://github.com/TEConnectivity
 
 **About the porting process:**
 
-The porting efforts focused on replacing Ardunio I2C APIs with MCP2221 ones, with minimum changes to variables and constants to accommodate the Microchip MCP2221 library APIs input/output arguments. Another reason these libraries are almost identical to the original TE Arduino libraries is to ease usage and integration for developers who have already Arduino experience. 
+The porting efforts focused on replacing Ardunio I2C APIs with MCP2221 ones, with minimum changes to variables and constants to accommodate the Microchip MCP2221 library APIs input/output arguments. Another reason to make the ported libraries almost identical to the original TE Arduino libraries is to ease usage and integration for developers who are new to the MCP2221 and/or already have Arduino experience. 
 
 **Tools and other requirements:**
 
